@@ -1,0 +1,49 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables – NEVER commit real credentials
+.env
+.env.local
+.env.*.local
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# AWS credentials – NEVER commit
+.aws/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Streamlit cache
+.streamlit/
+
+# Distribution / build
+dist/
+build/
+*.egg-info/
+
+# SQLite user database � contains user accounts, do not commit
+users.db
+*.db
+*.sqlite3
+
+# Streamlit secrets file
+.streamlit/secrets.toml
+
+# Logs
+*.log

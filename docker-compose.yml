@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  cloud-cost-panel:
+    build: .
+    container_name: cloud-cost-panel
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    volumes:
+      # Persist the SQLite users database so accounts survive container restarts
+      - ./users.db:/app/users.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
