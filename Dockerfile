@@ -16,6 +16,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy all project files into the container
 COPY . .
 
+# Ensure the data directory exists for the SQLite database
+RUN mkdir -p /app/data
+
 # Streamlit runs on port 8501 by default
 EXPOSE 8501
 

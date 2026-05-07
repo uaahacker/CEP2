@@ -10,7 +10,7 @@ services:
       - .env
     volumes:
       # Persist the SQLite users database so accounts survive container restarts
-      - ./users.db:/app/users.db
+      - ./data:/app/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8501/_stcore/health"]

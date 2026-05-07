@@ -19,7 +19,7 @@ import streamlit as st
 import bcrypt
 
 # ── Database file path (kept outside the app directory in production)
-DB_PATH = os.environ.get("AUTH_DB_PATH", "users.db")
+DB_PATH = os.environ.get("AUTH_DB_PATH", "/app/data/users.db")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
