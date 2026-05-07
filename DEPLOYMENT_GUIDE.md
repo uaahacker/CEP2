@@ -1,36 +1,32 @@
-# 🚀 AWS EC2 Deployment Guide
+# AWS EC2 Deployment Guide
 
-> Complete step-by-step guide to deploy **Cloud Cost Management Panel**  
-> on AWS EC2 using Docker, Nginx, and HTTPS (Let's Encrypt).
+Step-by-step instructions to deploy the Cloud Cost Management Panel on AWS EC2 using Docker.
 
 ---
 
 ## Prerequisites
 
 - An AWS account
-- An EC2 instance running **Ubuntu 22.04 LTS**
-- A domain name or subdomain pointing to your EC2 public IP  
-  *(e.g. `cloudcost.yourdomain.com`)*
-- Your GitHub repository is pushed and public (or accessible)
+- An EC2 instance running Ubuntu 22.04 LTS
+- Your GitHub repository accessible from the server
 
 ---
 
 ## Step 1 – Launch EC2 Instance
 
-1. Go to **EC2 → Launch Instance**
-2. Choose **Ubuntu Server 22.04 LTS (64-bit x86)**
-3. Instance type: **t3.micro** (Free Tier eligible) or **t3.small** for better performance
-4. Key pair: create or select an existing `.pem` key
+1. Go to EC2 → Launch Instance
+2. Choose Ubuntu Server 22.04 LTS (64-bit x86)
+3. Instance type: t3.micro (Free Tier eligible)
+4. Key pair: create or select an existing .pem key
 
 ### Security Group Inbound Rules
 
 | Type | Port | Source |
 |---|---|---|
-| SSH | 22 | Your IP only (not 0.0.0.0/0) |
-| HTTP | 80 | 0.0.0.0/0 |
-| HTTPS | 443 | 0.0.0.0/0 |
+| SSH | 22 | Your IP only |
+| Custom TCP | 8501 | 0.0.0.0/0 |
 
-5. Storage: **20 GB gp3** (default 8 GB is fine too)
+5. Storage: 8 GB gp3 (default) is sufficient
 6. Launch the instance
 
 ---
@@ -51,10 +47,7 @@ sudo apt update && sudo apt upgrade -y
 
 sudo apt install -y \
     docker.io \
-    docker-compose-plugin \
-    nginx \
-    certbot \
-    python3-certbot-nginx \
+    docker-compose \
     git \
     curl
 
@@ -69,12 +62,12 @@ newgrp docker
 
 ---
 
-## Step 4 – Clone Your GitHub Repository
+## Step 4 – Clone the Repository
 
 ```bash
 cd ~
-git clone https://github.com/YOUR_USERNAME/cloud-cost-management-panel.git
-cd cloud-cost-management-panel
+git clone https://github.com/uaahacker/CEP2.git
+cd CEP2
 ```
 
 ---
@@ -89,12 +82,12 @@ nano .env
 Edit the values:
 
 ```env
-# Add your real AWS credentials here (or leave blank for Demo Mode)
-AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
-AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+# AWS credentials (optional – leave blank for Demo Mode)
+AWS_ACCESS_KEY_ID=your_key_here
+AWS_SECRET_ACCESS_KEY=your_secret_here
 AWS_DEFAULT_REGION=us-east-1
 
-AUTH_DB_PATH=users.db
+AUTH_DB_PATH=/app/data/users.db
 STREAMLIT_SERVER_PORT=8501
 ```
 
@@ -102,104 +95,38 @@ Save with `Ctrl+O`, exit with `Ctrl+X`.
 
 ---
 
-## Step 6 – Build and Start the Docker Container
+## Step 6 – Build and Start the Container
 
 ```bash
-docker compose up -d --build
+mkdir -p data
+docker-compose up -d --build
 ```
 
 Verify the container is running:
 
 ```bash
-docker ps
+docker-compose ps
 ```
 
-Test locally on the server:
+Test the health endpoint:
 
 ```bash
 curl http://localhost:8501/_stcore/health
 ```
 
-You should see `{"status":"ok"}`.
+You should see `ok`.
 
 ---
 
-## Step 7 – Configure Nginx as Reverse Proxy
+## Step 7 – Access the App
 
-Create the Nginx site configuration:
+Open a browser and go to:
 
-```bash
-sudo nano /etc/nginx/sites-available/cloud-cost-panel
+```
+http://YOUR_EC2_PUBLIC_IP:8501
 ```
 
-Paste this configuration (replace `YOUR_DOMAIN_OR_SUBDOMAIN`):
-
-```nginx
-server {
-    listen 80;
-    server_name YOUR_DOMAIN_OR_SUBDOMAIN;
-
-    location / {
-        proxy_pass http://127.0.0.1:8501;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_read_timeout 86400;
-    }
-}
-```
-
-Enable the site:
-
-```bash
-sudo ln -s /etc/nginx/sites-available/cloud-cost-panel \
-           /etc/nginx/sites-enabled/
-
-sudo nginx -t
-sudo systemctl restart nginx
-```
-
----
-
-## Step 8 – Enable HTTPS with Certbot (Let's Encrypt)
-
-> **Prerequisite:** Your domain's DNS A record must point to the EC2 public IP.
-
-```bash
-sudo certbot --nginx -d YOUR_DOMAIN_OR_SUBDOMAIN
-```
-
-Follow the prompts:
-- Enter your email address
-- Agree to terms of service
-- Choose to redirect HTTP to HTTPS (recommended)
-
-Certbot automatically updates your Nginx config and adds the SSL certificate.
-
-Verify HTTPS:
-
-```bash
-sudo nginx -t
-sudo systemctl restart nginx
-```
-
-Open a browser: **https://YOUR_DOMAIN_OR_SUBDOMAIN**
-
----
-
-## Step 9 – Test the Deployment
-
-1. Open **https://YOUR_DOMAIN_OR_SUBDOMAIN** in a browser
-2. You should see the **Login / Sign Up** page
-3. Create an account and log in
-4. Check the mode badge:
-   - Green = Real AWS data
-   - Yellow = Demo Mode (no credentials)
-5. Explore the dashboard
+You should see the login page. Use the Sign Up tab to create an account.
 
 ---
 
@@ -208,35 +135,29 @@ Open a browser: **https://YOUR_DOMAIN_OR_SUBDOMAIN**
 ### View container logs
 
 ```bash
-docker logs cloud-cost-panel
-docker logs -f cloud-cost-panel   # follow (live tail)
+docker-compose logs cloud-cost-panel
+docker-compose logs -f cloud-cost-panel   # follow live
 ```
 
 ### Stop the app
 
 ```bash
-cd ~/cloud-cost-management-panel
-docker compose down
+cd ~/CEP2
+docker-compose down
 ```
 
-### Update after pushing new code to GitHub
+### Update after pushing new code
 
 ```bash
-cd ~/cloud-cost-management-panel
+cd ~/CEP2
 git pull
-docker compose up -d --build
+docker-compose up -d --build
 ```
 
-### Restart the app
+### Restart
 
 ```bash
-docker compose restart
-```
-
-### Renew SSL certificate (auto-renews via cron, but manual test)
-
-```bash
-sudo certbot renew --dry-run
+docker-compose restart
 ```
 
 ---
@@ -246,18 +167,15 @@ sudo certbot renew --dry-run
 | Symptom | Fix |
 |---|---|
 | `docker: permission denied` | Run `newgrp docker` or re-login |
-| `502 Bad Gateway` | Container not running – check `docker ps` and `docker logs` |
-| `curl: connection refused` on port 8501 | Container not started – `docker compose up -d` |
-| Certbot fails | Check DNS A record points to EC2 IP; port 80 must be open |
-| App shows error on data load | AWS credentials may be wrong – will fall back to Demo Mode |
+| Cannot connect on port 8501 | Check EC2 security group has inbound rule for port 8501 |
+| SQLite error on startup | Ensure `./data` directory exists and `AUTH_DB_PATH=/app/data/users.db` is set in .env |
+| App shows error on data load | AWS credentials may be wrong – app falls back to Demo Mode automatically |
 
 ---
 
-## Security Checklist Before Sharing Live URL
+## Security Notes
 
-- [ ] `.env` is **not** committed to GitHub
-- [ ] EC2 Security Group SSH (port 22) restricted to your IP only
-- [ ] HTTPS is enabled and HTTP redirects to HTTPS
-- [ ] AWS IAM user has only `ce:GetCostAndUsage` permission
-- [ ] Root AWS credentials are NOT used
-- [ ] Set AWS Budget alert (see `docs/shutdown-budget-controls.md`)
+- SSH access is restricted to your IP only
+- Port 8501 is open to the internet for demo purposes
+- Do not commit `.env` to GitHub
+- Stop or terminate the EC2 instance after the demo to avoid ongoing charges

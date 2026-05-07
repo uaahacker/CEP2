@@ -1,6 +1,6 @@
-# 🔒 Security Assumptions
+# Security Assumptions
 
-This document describes the security design decisions for the **Cloud Cost Management Panel** project.
+This document describes the security design decisions for the Cloud Cost Management Panel project.
 
 ---
 
@@ -61,11 +61,11 @@ Only the minimum IAM permission needed is granted:
 
 ---
 
-## 3. HTTPS / TLS
+## 3. Network Access
 
-- The app is served over **HTTPS** using a free Let's Encrypt certificate
-- HTTP traffic is automatically redirected to HTTPS by Nginx
-- Certificate auto-renewal is managed by Certbot
+The app is served over plain HTTP on port 8501 for this academic demo deployment. There is no domain name and no TLS certificate configured.
+
+For a production deployment, HTTPS would be added using a load balancer with an AWS ACM certificate, or Nginx with Let's Encrypt once a domain is available.
 
 ---
 
@@ -73,10 +73,8 @@ Only the minimum IAM permission needed is granted:
 
 | Port | Access | Reason |
 |---|---|---|
-| 22 (SSH) | Your IP only | Prevent brute-force SSH attacks |
-| 80 (HTTP) | 0.0.0.0/0 | Nginx redirects to HTTPS |
-| 443 (HTTPS) | 0.0.0.0/0 | Public access to the app |
-| 8501 | Not exposed | Streamlit port is internal only (proxied by Nginx) |
+| 22 (SSH) | Your IP only | Prevents brute-force SSH attacks |
+| 8501 (Streamlit) | 0.0.0.0/0 | Public access to the app |
 
 ---
 
@@ -103,7 +101,7 @@ Only the minimum IAM permission needed is granted:
 | Authentication | SQLite + bcrypt | AWS Cognito / Auth0 |
 | Secrets management | `.env` file | AWS Secrets Manager |
 | Database | SQLite | Amazon RDS or DynamoDB |
-| HTTPS | Let's Encrypt | AWS ACM + ALB |
+| HTTPS | Not configured (demo) | AWS ACM + ALB |
 | Logging | Docker logs | AWS CloudWatch |
 | IAM | Access keys | IAM Role on EC2 |
 | Input validation | Basic | Comprehensive (OWASP) |

@@ -1,6 +1,6 @@
-# 🛠️ AWS Services Used
+# AWS Services Used
 
-This document lists all AWS and supporting services used in the **Cloud Cost Management Panel** project.
+This document lists the AWS and supporting services used in the Cloud Cost Management Panel project.
 
 ---
 
@@ -48,11 +48,10 @@ Required IAM policy:
 
 ## 4. EC2 Security Groups
 
-- **Purpose:** Network-level firewall controlling inbound/outbound traffic to the EC2 instance
+- **Purpose:** Network-level firewall controlling inbound traffic to the EC2 instance
 - **Inbound rules configured:**
-  - Port 22 (SSH) – your IP only
-  - Port 80 (HTTP) – 0.0.0.0/0 (redirected to HTTPS by Nginx)
-  - Port 443 (HTTPS) – 0.0.0.0/0
+  - Port 22 (SSH) – restricted to deployer's IP only
+  - Port 8501 (Streamlit) – open to 0.0.0.0/0 for public access
 
 ---
 
@@ -60,32 +59,10 @@ Required IAM policy:
 
 - **Purpose:** Root volume storage for the EC2 instance (OS + Docker images + SQLite database)
 - **Type:** gp3 (General Purpose SSD)
-- **Size:** 20 GB (default 8 GB is sufficient for this project)
+- **Size:** 8–20 GB
 
 ---
 
-## 6. Nginx (installed on EC2)
-
-- **Purpose:** Reverse proxy — forwards public HTTPS traffic on port 443 to the Docker container on port 8501
-- **Also handles:** WebSocket upgrade headers required by Streamlit
-
----
-
-## 7. Let's Encrypt / Certbot (installed on EC2)
-
-- **Purpose:** Issues a free, trusted TLS/SSL certificate for HTTPS
-- **Tool:** Certbot with the Nginx plugin
-- **Certificate auto-renewal:** Managed by Certbot's cron/systemd timer
-
----
-
-## 8. Optional: Amazon Route 53 (or external DNS)
-
-- **Purpose:** Manages the domain name DNS records (A record pointing to EC2 public IP)
-- **Alternative:** Use any external DNS provider (Cloudflare, GoDaddy, Namecheap, etc.)
-- **Required for:** Let's Encrypt certificate issuance via domain validation
-
----
 
 ## Summary Table
 
@@ -96,6 +73,3 @@ Required IAM policy:
 | Cost Explorer | Analytics | Real AWS cost data source |
 | Security Groups | Networking | Firewall rules |
 | EBS | Storage | Disk for EC2 instance |
-| Nginx | Proxy | HTTPS reverse proxy |
-| Let's Encrypt | Certificate | Free TLS/SSL cert |
-| Route 53 / DNS | DNS | Domain resolution (optional) |

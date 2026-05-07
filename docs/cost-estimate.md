@@ -1,7 +1,6 @@
-# 💰 Cost Estimate – Cloud Cost Management Panel
+# Cost Estimate
 
-> Approximate monthly AWS cost for running this academic demo project.  
-> Actual costs depend on region, usage, and AWS pricing changes.
+Approximate monthly AWS cost for running this academic demo project. Actual costs depend on region, usage, and AWS pricing changes.
 
 ---
 

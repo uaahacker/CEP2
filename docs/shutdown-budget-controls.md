@@ -1,6 +1,6 @@
-# 🛑 Shutdown & Budget Controls
+# Shutdown and Budget Controls
 
-This document describes how to control costs and safely shut down the **Cloud Cost Management Panel** project after the demo.
+This document describes how to control costs and safely shut down the Cloud Cost Management Panel project after the demo.
 
 ---
 
@@ -47,8 +47,8 @@ If the EC2 instance is still running but you want to stop the app:
 
 ```bash
 ssh into your EC2 instance
-cd ~/cloud-cost-management-panel
-docker compose down
+cd ~/CEP2
+docker-compose down
 ```
 
 ---
