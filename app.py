@@ -511,8 +511,8 @@ def main() -> None:
         st.markdown("""
         | Deliverable | Link |
         |---|---|
-        | Live App URL | *(add after deployment)* |
-        | GitHub Repo URL | *(add after push)* |
+        | Live App URL | *http://44.204.153.21:8501/* |
+        | GitHub Repo URL | *https://github.com/ghazanfarali23/CEP2* |
         """)
 
     # ── Footer ────────────────────────────────────────────────────────────────
