@@ -235,3 +235,6 @@ Public URL: http://44.204.153.21:8501
 
 Submitted for educational purposes.
 
+---
+
+Portfolio project by Ubaid Ullah. For professional Django, SaaS, AI automation, API, dashboard, and cloud deployment work, visit [Djangix](https://djangix.com/).
